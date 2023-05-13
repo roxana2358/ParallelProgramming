@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdlib.h>
-
-int const MAX_LINE_LENGTH = 200;
-int const MAX_PATTERN_LENGTH = 20;
-
 // FUNZIONE CHE POPOLA LA LSP (LONGEST PREFIX SUFFIX) TABLE
 void fillLPS(int *LSPtable, char pattern[]) {
     // primo elemento 0
@@ -68,21 +62,4 @@ int KMPmatch(char string[], char pattern[]) {
 
     // restituisco il numero di occorrenze trovate
     return cont;
-}
-
-// FUNZIONE CHE POPOLA UN ARRAY CON LE RIGHE DI UN FILE E RESTITUISCE IL NUOVO PUNTATORE
-char ** splitFile(FILE *file, int *arrayLength, int k) {
-    char **array = (char **) malloc(sizeof(char *));
-    int count = 0;
-    char line[k];
-
-    while (fgets(line, k, file)!=NULL) {
-        array = realloc(array, (count+1)*sizeof(char*));
-        line[strcspn(line, "\n")] = 0;
-        array[count] = (char *) malloc(strlen(line)*sizeof(char));
-        strcpy(array[count], line);
-        count+=1;
-    }
-    *(arrayLength) = count;
-    return array;
 }

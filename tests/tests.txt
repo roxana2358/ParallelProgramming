@@ -1,0 +1,30 @@
+# compile
+gcc -Wall serial.c -o serial
+
+# execute
+1. program name
+2. text/packets file
+3. patterns file
+4. how many patterns to look for
+5. output on file
+
+// test 3600 packets, 5 patterns
+./serial alice_in_wonderland.txt pattern5.txt 5 > out.txt
+
+// test 3600 packets, 50 patterns
+./serial alice_in_wonderland.txt pattern50.txt 50 > out.txt
+
+// test 3600 packets, 1000 patterns
+./serial alice_in_wonderland.txt pattern1000.txt 1000 > out.txt
+
+// test 3600 packets, 3000 patterns
+./serial alice_in_wonderland.txt pattern3000.txt 5 > out.txt
+
+// test 5000 packets, 100 patterns
+./serial file5000.txt pattern3000.txt 100 > out.txt
+
+// test 5000 packets, 3000 patterns
+./serial file5000.txt pattern3000.txt 3000 > out.txt
+
+// test 10000 packets, 3000 patterns
+./serial file10000.txt pattern3000.txt 3000 > out.txt
