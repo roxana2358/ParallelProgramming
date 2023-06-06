@@ -5,6 +5,7 @@
 #include "functions.h"
 #include <time.h>
 #include "timer.h"
+#include <omp.h>
 
 int main(int argc, char *argv[]) {
     // check for correct input
@@ -73,4 +74,5 @@ int main(int argc, char *argv[]) {
     free(pack);
     fclose(packetsFile);
     fclose(patternsFile);
+
 }

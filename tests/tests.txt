@@ -1,5 +1,6 @@
 # compile
 gcc -Wall serial.c -o serial
+mpicc -g -Wall mpi.c -o mpi -lm
 
 # execute
 1. program name
@@ -9,22 +10,33 @@ gcc -Wall serial.c -o serial
 5. output on file
 
 // test 3600 packets, 5 patterns
-./serial alice_in_wonderland.txt pattern5.txt 5 > out.txt
+./serial txt_files/alice_in_wonderland.txt pattern5.txt 5 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/alice_in_wonderland.txt pattern5.txt 5 > outs/outMpi.txt
 
 // test 3600 packets, 50 patterns
-./serial alice_in_wonderland.txt pattern50.txt 50 > out.txt
+./serial txt_files/alice_in_wonderland.txt pattern50.txt 50 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/alice_in_wonderland.txt pattern50.txt 50 > outs/outMpi.txt
 
 // test 3600 packets, 1000 patterns
-./serial alice_in_wonderland.txt pattern1000.txt 1000 > out.txt
+./serial txt_files/alice_in_wonderland.txt pattern1000.txt 1000 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/alice_in_wonderland.txt pattern1000.txt 1000 > outs/outMpi.txt
 
 // test 3600 packets, 3000 patterns
-./serial alice_in_wonderland.txt pattern3000.txt 5 > out.txt
+./serial txt_files/alice_in_wonderland.txt pattern3000.txt 5 > outs/outSer.txt
+mpiexec -n 5 ./mpi txt_files/alice_in_wonderland.txt pattern3000.txt 5 > outs/outMpi.txt
 
 // test 5000 packets, 100 patterns
-./serial file5000.txt pattern3000.txt 100 > out.txt
+./serial txt_files/file5000.txt pattern3000.txt 100 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/file5000.txt pattern3000.txt 100 > outs/outMpi.txt
 
 // test 5000 packets, 3000 patterns
-./serial file5000.txt pattern3000.txt 3000 > out.txt
+./serial txt_files/file5000.txt pattern3000.txt 3000 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/file5000.txt pattern3000.txt 3000 > outs/outMpi.txt
 
 // test 10000 packets, 3000 patterns
-./serial file10000.txt pattern3000.txt 3000 > out.txt
+./serial txt_files/file10000.txt pattern3000.txt 3000 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/file10000.txt pattern3000.txt 3000 > outs/outMpi.txt
+
+// test 100000 packets, 3000 patterns
+./serial txt_files/file100000.txt pattern3000.txt 3000 > outs/outSer.txt
+mpiexec -n 10 ./mpi txt_files/file100000.txt pattern3000.txt 3000 > outs/outMpi.txt
