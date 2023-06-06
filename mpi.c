@@ -1,10 +1,11 @@
+#include <mpi.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "algorithm.h"
 #include "functions.h"
 #include <time.h>
-#include "timer.h"
+#include <math.h>
 
 int main(int argc, char *argv[]) {
     // check for correct input
@@ -50,22 +51,40 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // take timings
-    double start_t = 0, end_t = 0;
-    GET_TIME(start_t);
+    // initialize MPI
+    int comm_sz;
+    int my_rank;
+    MPI_Init(NULL, NULL);
+    MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-    int cont = 0;
-    // for each pattern apply the algorithm
-    for (int i=0; i<NUMBER_OF_PATTERNS; i++) {
-        // apply KNM algorithm to all lines/packets
-        cont = KMPmatch(pack, patt[i]);
+    // prepare individual data
+    int cont, local_patterns = (int) ceil(((double)NUMBER_OF_PATTERNS/(double)comm_sz));
+
+    // take timings
+    double start_t, end_t, my_time, max_time = 0;
+    start_t = MPI_Wtime();
+
+    // apply algorithm
+    for (int i = 0; i < local_patterns; i++) {
+        if (my_rank*local_patterns + i >= NUMBER_OF_PATTERNS) break;
+        cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
         // print result
-        printf("%s was found %d times.\n", patt[i], cont);
+        printf("%s was found %d times by proc %d.\n", patt[my_rank*local_patterns + i], cont, my_rank);
     }
 
-    // stop timer
-    GET_TIME(end_t)
-    printf("\nTime: %f seconds", (end_t - start_t));
+    // stop my timer
+    end_t = MPI_Wtime();
+    my_time = end_t - start_t;
+    MPI_Reduce(&my_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    // print longest time
+    if (my_rank == 0) {
+        printf("\nTime: %f seconds for the longest process.", max_time);
+    }
+
+    // finalize MPI
+    MPI_Finalize();
 
     // free memory
     for (int i=0; i<NUMBER_OF_PATTERNS; i++) free(patt[i]);
