@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     double start_t, end_t, my_time, max_time = 0;
     start_t = MPI_Wtime();
 
-    // apply algorithm for each assigned pattern
+    // apply algorithm for each assigned batch of patterns
     for (int i = 0; i < local_patterns; i++) {
         if (my_rank*local_patterns + i >= patterns_num) break;
         cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);

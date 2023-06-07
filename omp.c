@@ -49,32 +49,23 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int local_patterns = (int) ceil(((double)patterns_num/(double)THREADS_NUMBER));
-    double max_time = 0;
-    # pragma omp parallel num_threads(THREADS_NUMBER)
-    {
-        int cont, my_rank = omp_get_thread_num();
+    // take timings
+    double start_t, end_t;
+    start_t = omp_get_wtime();
 
-        // take timings
-        double start_t = 0, end_t = 0;
-        start_t = omp_get_wtime();
-
-        for (int i = 0; i < local_patterns; i++) {
-            if (my_rank*local_patterns + i >= patterns_num) break;
-            cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
-            // print result
-            printf("%s was found %d times by thread %d.\n", patt[my_rank*local_patterns + i], cont, my_rank);
-        }
-
-        // stop timer
-        end_t = omp_get_wtime();
-        double my_time = end_t-start_t;
-        # pragma omp critical(time)
-        max_time = ((max_time > my_time) ? max_time : my_time);
+    int cont;
+    # pragma omp parallel for num_threads(THREADS_NUMBER) private(cont)
+    for (int i = 0; i < patterns_num; i++) {
+        // apply algorithm
+        cont = KMPmatch(pack, patt[i]);
+        // print result
+        printf("%s was found %d times by thread %d.\n", patt[i], cont, omp_get_thread_num());
     }
 
-    // max time
-    printf("\nTime: %f seconds", max_time);
+    // stop timer
+    end_t = omp_get_wtime();
+    double time = end_t-start_t;
+    printf("\nTime: %f seconds", time);
 
     // free memory
     for (int i=0; i<patterns_num; i++) free(patt[i]);
