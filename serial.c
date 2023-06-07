@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     // check for correct input
-    if (argc!=4) {
+    if (argc!=3) {
         printf("Seems like your input is incorrect!\n");
         exit(EXIT_FAILURE);
     }
@@ -29,13 +29,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // get the number of patterns
-    int const NUMBER_OF_PATTERNS = atoi(argv[3]);
-    if (NUMBER_OF_PATTERNS<1) {
-        printf("No patterns to find!\n");
-        exit(EXIT_FAILURE);
-    }
-
     // fuse all packets in one string
     char *pack = fusePackets(packetsFile);
     if (pack==NULL) {
@@ -44,8 +37,9 @@ int main(int argc, char *argv[]) {
     }
 
     // separate patterns in an array
-    char **patt = splitPatterns(patternsFile, NUMBER_OF_PATTERNS);
-    if (patt==NULL) {
+    int patterns_num;
+    char **patt = splitPatterns(patternsFile, &patterns_num);
+    if (patt==NULL || patterns_num == 0) {
         printf("Errors with the patterns.\n");
         exit(EXIT_FAILURE);
     }
@@ -56,7 +50,7 @@ int main(int argc, char *argv[]) {
 
     int cont = 0;
     // for each pattern apply the algorithm
-    for (int i=0; i<NUMBER_OF_PATTERNS; i++) {
+    for (int i=0; i<patterns_num; i++) {
         // apply KNM algorithm to all lines/packets
         cont = KMPmatch(pack, patt[i]);
         // print result
@@ -68,7 +62,7 @@ int main(int argc, char *argv[]) {
     printf("\nTime: %f seconds", (end_t - start_t));
 
     // free memory
-    for (int i=0; i<NUMBER_OF_PATTERNS; i++) free(patt[i]);
+    for (int i=0; i<patterns_num; i++) free(patt[i]);
     free(patt);
     free(pack);
     fclose(packetsFile);

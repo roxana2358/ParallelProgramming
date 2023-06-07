@@ -1,9 +1,10 @@
 int const MAX_PATTERN_LENGTH = 20;
+int const MAX_PATTERNS_NUMBER = 3000;
 
 // FUNZIONE CHE POPOLA L'ARRAY DI PATTERN E RESTITUISCE IL PUNTATORE A TALE ARRAY
-char ** splitPatterns(FILE *file, int patN) {
+char ** splitPatterns(FILE *file, int *patN) {
     // initialize patterns array
-    char **array = (char **) malloc(sizeof(char *)*patN);
+    char **array = (char **) malloc(sizeof(char *)*MAX_PATTERNS_NUMBER);
 
     // counter for patterns
     int count = 0;
@@ -11,7 +12,7 @@ char ** splitPatterns(FILE *file, int patN) {
     // buffer for the lines
     char line[MAX_PATTERN_LENGTH];
 
-    while (fgets(line, MAX_PATTERN_LENGTH, file)!=NULL && count<patN) {
+    while (fgets(line, MAX_PATTERN_LENGTH, file)!=NULL) {
         // remove line break
         line[strcspn(line, "\n")] = 0;
         // allocate space for the pattern
@@ -21,6 +22,9 @@ char ** splitPatterns(FILE *file, int patN) {
         count+=1;
     }
 
+    // reallocate patterns array
+    *patN = count;
+    array = realloc(array, sizeof(char *)*count);
     return array;
 }
 
