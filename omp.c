@@ -1,15 +1,16 @@
-#include <mpi.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "algorithm.h"
 #include "functions.h"
 #include <time.h>
+#include "timer.h"
 #include <math.h>
+#include <omp.h>
 
 int main(int argc, char *argv[]) {
     // check for correct input
-    if (argc!=3) {
+    if (argc!=4) {
         printf("Seems like your input is incorrect!\n");
         exit(EXIT_FAILURE);
     }
@@ -30,6 +31,9 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // get number of threads
+    int const THREADS_NUMBER = atoi(argv[3]);
+
     // fuse all packets in one string
     char *pack = fusePackets(packetsFile);
     if (pack==NULL) {
@@ -45,40 +49,32 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // initialize MPI
-    int comm_sz;
-    int my_rank;
-    MPI_Init(NULL, NULL);
-    MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    int local_patterns = (int) ceil(((double)patterns_num/(double)THREADS_NUMBER));
+    double max_time = 0;
+    # pragma omp parallel num_threads(THREADS_NUMBER)
+    {
+        int cont, my_rank = omp_get_thread_num();
 
-    // prepare individual data
-    int cont, local_patterns = (int) ceil(((double)patterns_num/(double)comm_sz));
+        // take timings
+        double start_t = 0, end_t = 0;
+        start_t = omp_get_wtime();
 
-    // take timings
-    double start_t, end_t, my_time, max_time = 0;
-    start_t = MPI_Wtime();
+        for (int i = 0; i < local_patterns; i++) {
+            if (my_rank*local_patterns + i >= patterns_num) break;
+            cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
+            // print result
+            printf("%s was found %d times by thread %d.\n", patt[my_rank*local_patterns + i], cont, my_rank);
+        }
 
-    // apply algorithm for each assigned pattern
-    for (int i = 0; i < local_patterns; i++) {
-        if (my_rank*local_patterns + i >= patterns_num) break;
-        cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
-        // print result
-        printf("%s was found %d times by process %d.\n", patt[my_rank*local_patterns + i], cont, my_rank);
+        // stop timer
+        end_t = omp_get_wtime();
+        double my_time = end_t-start_t;
+        # pragma omp critical(time)
+        max_time = ((max_time > my_time) ? max_time : my_time);
     }
 
-    // stop my timer
-    end_t = MPI_Wtime();
-    my_time = end_t - start_t;
-    MPI_Reduce(&my_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-
-    // print longest time
-    if (my_rank == 0) {
-        printf("\nTime: %f seconds for the longest process.", max_time);
-    }
-
-    // finalize MPI
-    MPI_Finalize();
+    // max time
+    printf("\nTime: %f seconds", max_time);
 
     // free memory
     for (int i=0; i<patterns_num; i++) free(patt[i]);

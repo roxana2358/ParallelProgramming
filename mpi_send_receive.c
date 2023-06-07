@@ -8,8 +8,8 @@
 #include <math.h>
 
 int main(int argc, char *argv[]) {
-    // check for correct input
-    if (argc!=4) {
+// check for correct input
+    if (argc!=3) {
         printf("Seems like your input is incorrect!\n");
         exit(EXIT_FAILURE);
     }
@@ -30,13 +30,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // get the number of patterns
-    int const NUMBER_OF_PATTERNS = atoi(argv[3]);
-    if (NUMBER_OF_PATTERNS<1) {
-        printf("No patterns to find!\n");
-        exit(EXIT_FAILURE);
-    }
-
     // fuse all packets in one string
     char *pack = fusePackets(packetsFile);
     if (pack==NULL) {
@@ -45,8 +38,9 @@ int main(int argc, char *argv[]) {
     }
 
     // separate patterns in an array
-    char **patt = splitPatterns(patternsFile, NUMBER_OF_PATTERNS);
-    if (patt==NULL) {
+    int patterns_num;
+    char **patt = splitPatterns(patternsFile, &patterns_num);
+    if (patt==NULL || patterns_num == 0) {
         printf("Errors with the patterns.\n");
         exit(EXIT_FAILURE);
     }
@@ -59,7 +53,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
     // prepare individual data
-    int local_patterns = (int) ceil(((double)NUMBER_OF_PATTERNS/(double)comm_sz));
+    int local_patterns = (int) ceil(((double)patterns_num/(double)comm_sz));
 
     // take timings
     double start_t, end_t, my_time, max_time = 0;
@@ -81,7 +75,7 @@ int main(int argc, char *argv[]) {
         MPI_Reduce(&my_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
         // receive results
-        for (int p = local_patterns; p < NUMBER_OF_PATTERNS; p++) {
+        for (int p = local_patterns; p < patterns_num; p++) {
             MPI_Recv(msg, sizeof(msg), MPI_CHAR, p/local_patterns, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             printf("%s", msg);
         }
@@ -92,7 +86,7 @@ int main(int argc, char *argv[]) {
     } else { // if other process, apply algorithm and send response
         for (int i = 0; i < local_patterns; i++) {
             // too many processes for the patterns
-            if (my_rank*local_patterns + i >= NUMBER_OF_PATTERNS) break;
+            if (my_rank*local_patterns + i >= patterns_num) break;
             // compute
             cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
             // send result
@@ -110,7 +104,7 @@ int main(int argc, char *argv[]) {
     MPI_Finalize();
 
     // free memory
-    for (int i=0; i<NUMBER_OF_PATTERNS; i++) free(patt[i]);
+    for (int i=0; i<patterns_num; i++) free(patt[i]);
     free(patt);
     free(pack);
     fclose(packetsFile);
