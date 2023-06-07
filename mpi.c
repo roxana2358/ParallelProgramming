@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         if (my_rank*local_patterns + i >= patterns_num) break;
         cont = KMPmatch(pack, patt[my_rank*local_patterns + i]);
         // print result
-        printf("%s was found %d times by process %d.\n", patt[my_rank*local_patterns + i], cont, my_rank);
+        printf("%s was found %d times by process %d of %d.\n", patt[my_rank*local_patterns + i], cont, my_rank, comm_sz);
     }
 
     // stop my timer
