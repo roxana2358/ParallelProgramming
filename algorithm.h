@@ -29,7 +29,7 @@ void fillLPS(int *LSPtable, char pattern[]) {
 }
 
 // FUNZIONE CHE ESEGUE L'ALGORITMO KHUTH-MORRIS-PRATT
-int KMPmatch(char string[], char pattern[]) {
+int KMPmatch(char str[], char pattern[]) {
     // indici per scorrere stringa e pattern
     int i=0, j=0;
 
@@ -37,14 +37,14 @@ int KMPmatch(char string[], char pattern[]) {
     int cont=0;
 
     // lunghezze di stringa e pattern
-    int lenS=strlen(string), lenP=strlen(pattern);
+    int lenS=strlen(str), lenP=strlen(pattern);
 
     // alloco spazio e popolo la LSP table
     int *LSPtable = (int *) malloc(lenP*sizeof(int));
     fillLPS(LSPtable, pattern);
 
     while (i<lenS) {
-        if (string[i]==pattern[j]) {        // match - incremento gli indici e controllo se ho trovato un'occorrenza del pattern
+        if (str[i]==pattern[j]) {        // match - incremento gli indici e controllo se ho trovato un'occorrenza del pattern
             i+=1;
             j+=1;
             if (j==lenP) {
