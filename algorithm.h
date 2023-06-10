@@ -44,14 +44,14 @@ int KMPmatch(char string[], char pattern[]) {
     fillLPS(LSPtable, pattern);
 
     while (i<lenS) {
-        if (string[i]==pattern[j]) {
+        if (string[i]==pattern[j]) {        // match - incremento gli indici e controllo se ho trovato un'occorrenza del pattern
             i+=1;
             j+=1;
             if (j==lenP) {
                 cont+=1;
                 j=LSPtable[j-1];
             }
-        } else {
+        } else {                            // no match - continuo ad esaminare la stringa sfruttando la LSP table
             if (j>0) j=LSPtable[j-1];
             else i+=1;
         }
