@@ -1,4 +1,4 @@
-INSTANCES := 10
+INSTANCES := 3
 
 tests: tests10-5 tests1000-5 tests100000-5 tests10-100 tests1000-100 tests100000-100 tests10-3000 tests1000-3000 tests100000-3000
 
@@ -24,7 +24,7 @@ clean:
 	rm mpi.o
 	rm omp.o
 
-cleantests:
+cleanouts:
 	rm outs/*
 
 .PHONY: clean, all, tests, cleantests, performance
