@@ -112,3 +112,11 @@ tests3600-3000:
 	./serial.o packets/alice_in_wonderland.txt patterns/pattern3000.txt > outs/outS3600-3000.txt
 	mpiexec -n $(INSTANCES) ./mpi.o packets/alice_in_wonderland.txt patterns/pattern3000.txt > outs/outM3600-3000-$(INSTANCES).txt
 	./omp.o packets/alice_in_wonderland.txt patterns/pattern3000.txt $(INSTANCES) > outs/outO3600-3000-$(INSTANCES).txt
+
+testsOrdered:
+	$(info Currently executing 3600 packets ordered mpi tests)
+	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern5.txt > outs/outMOrd3600-5-$(INSTANCES).txt
+	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern50.txt > outs/outMOrd3600-50-$(INSTANCES).txt
+	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern100.txt > outs/outMOrd3600-100-$(INSTANCES).txt
+	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern1000.txt > outs/outMOrd3600-1000-$(INSTANCES).txt
+	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern3000.txt > outs/outMOrd3600-3000-$(INSTANCES).txt
