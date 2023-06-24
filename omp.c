@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         // apply algorithm
         cont = KMPmatch(pack, patt[i]);
         // print result
-        printf("%s was found %d times by thread %d of %d.\n", patt[i], cont, omp_get_thread_num(), omp_get_num_threads());
+        printf("%s was found %d times by thread %d of %d.\n", patt[i], cont, omp_get_thread_num()+1, omp_get_num_threads());
     }
 
     // stop timer
