@@ -1,0 +1,7 @@
+Alice was found 396 times.
+rabbit was found 6 times.
+pizza was found 0 times.
+the was found 2102 times.
+project was found 0 times.
+
+Time: 0.003426 seconds

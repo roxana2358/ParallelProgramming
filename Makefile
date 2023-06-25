@@ -10,19 +10,23 @@ serial: serial.c
 mpi: mpi.c
 	mpicc -g -Wall mpi.c -o mpi.o -lm
 
-mpiOrdered: mpi_ordered.c
-	mpicc -g -Wall mpi_ordered.c -o mpi_ordered.o -lm
-# mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/file10.txt patterns/pattern10.txt > outs/outMOrdered10-10.txt
-
 omp: omp.c
 	gcc -g -Wall -fopenmp omp.c -o omp.o
 
-all: serial mpi omp
+mpiOrdered: mpi_ordered.c
+	mpicc -g -Wall mpi_ordered.c -o mpi_ordered.o -lm
+
+ompOrdered: omp_ordered.c
+	gcc -g -Wall -fopenmp omp_ordered.c -o omp_ordered.o
+
+all: serial mpi omp mpiOrdered ompOrdered
 
 clean:
 	rm serial.o
 	rm mpi.o
 	rm omp.o
+	rm mpi_ordered.o
+	rm omp_ordered.o
 
 cleanouts:
 	rm outs/*
@@ -113,10 +117,18 @@ tests3600-3000:
 	mpiexec -n $(INSTANCES) ./mpi.o packets/alice_in_wonderland.txt patterns/pattern3000.txt > outs/outM3600-3000-$(INSTANCES).txt
 	./omp.o packets/alice_in_wonderland.txt patterns/pattern3000.txt $(INSTANCES) > outs/outO3600-3000-$(INSTANCES).txt
 
-testsOrdered:
+testsMpiOrdered:
 	$(info Currently executing 3600 packets ordered mpi tests)
 	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern5.txt > outs/outMOrd3600-5-$(INSTANCES).txt
 	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern50.txt > outs/outMOrd3600-50-$(INSTANCES).txt
 	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern100.txt > outs/outMOrd3600-100-$(INSTANCES).txt
 	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern1000.txt > outs/outMOrd3600-1000-$(INSTANCES).txt
 	mpiexec -n $(INSTANCES) ./mpi_ordered.o packets/alice_in_wonderland.txt patterns/pattern3000.txt > outs/outMOrd3600-3000-$(INSTANCES).txt
+
+testsOmpOrdered:
+	$(info Currently executing 3600 packets ordered omp tests)
+	./omp_ordered.o packets/alice_in_wonderland.txt patterns/pattern5.txt $(INSTANCES) > outs/outOOrd3600-5-$(INSTANCES).txt
+	./omp_ordered.o packets/alice_in_wonderland.txt patterns/pattern50.txt $(INSTANCES) > outs/outOOrd3600-50-$(INSTANCES).txt
+	./omp_ordered.o packets/alice_in_wonderland.txt patterns/pattern100.txt $(INSTANCES) > outs/outOOrd3600-100-$(INSTANCES).txt
+	./omp_ordered.o packets/alice_in_wonderland.txt patterns/pattern1000.txt $(INSTANCES) > outs/outOOrd3600-1000-$(INSTANCES).txt
+	./omp_ordered.o packets/alice_in_wonderland.txt patterns/pattern3000.txt $(INSTANCES) > outs/outOOrd3600-3000-$(INSTANCES).txt
