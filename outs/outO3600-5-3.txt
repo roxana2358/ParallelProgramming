@@ -1,7 +1,0 @@
-pizza was found 0 times by thread 2 of 3.
-Alice was found 396 times by thread 1 of 3.
-rabbit was found 6 times by thread 1 of 3.
-the was found 2102 times by thread 2 of 3.
-project was found 0 times by thread 3 of 3.
-
-Time: 0.002414 seconds
